@@ -1,14 +1,14 @@
 object Form1: TForm1
-  Left = -332
+  Left = -366
   Height = 300
-  Top = 282
+  Top = 298
   Width = 300
   Caption = 'Form1'
   ClientHeight = 300
   ClientWidth = 300
   KeyPreview = True
   OnKeyDown = FormKeyDown
-  LCLVersion = '2.0.8.0'
+  LCLVersion = '2.0.10.0'
   object Button1: TButton
     Left = 88
     Height = 25
@@ -22,7 +22,7 @@ object Form1: TForm1
     Left = 120
     Height = 24
     Top = 96
-    Width = 56
+    Width = 59
     Caption = 'Snake'
     Font.CharSet = ANSI_CHARSET
     Font.Height = -21
@@ -574,7 +574,7 @@ object Form1: TForm1
   object Timer1: TTimer
     Enabled = False
     OnTimer = Timer1Timer
-    left = 235
-    top = 42
+    Left = 235
+    Top = 42
   end
 end

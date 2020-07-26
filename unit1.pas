@@ -23,7 +23,7 @@ type
     procedure spawnNewFood();
     procedure Timer1Timer(Sender: TObject);
     procedure UpdatePixels();
-    procedure InsertX(var A: snakeArrayType; const Index: Cardinal; const Value: Variant);
+    procedure PrependItem(var snakeArray: snakeArrayType; const item: Variant);
     procedure DebugSnake();
   private
 
@@ -65,22 +65,17 @@ begin
    Timer1.Enabled:=true;
 end;
 
-procedure TForm1.InsertX(var A: snakeArrayType; const Index: Cardinal; const Value: Variant);
-var
-  ALength: Cardinal;
-  TailElements: Cardinal;
+
+procedure TForm1.PrependItem(var snakeArray: snakeArrayType; const item: Variant);
+var tempArray: snakeArrayType;
+  i: Integer;
 begin
-  ALength := Length(A);
-  Assert(Index <= ALength);
-  SetLength(A, ALength + 1);
-  Finalize(A[ALength]);
-  TailElements := ALength - Index;
-  if TailElements > 0 then
-  begin
-    Move(A[Index], A[Index + 1], SizeOf(Variant) * TailElements);
-  end;
-  Initialize(A[Index]);
-  A[Index] := Value;
+  SetLength(tempArray, Length(snakeArray) + 1);
+  tempArray[0] := item;
+  for i := Low(snakeArray) to High(snakeArray) do
+      tempArray[1+i] := snakeArray[i];
+  SetLength(snakeArray, Length(snakeArray) + 1);
+  snakeArray := tempArray;
 end;
 
 procedure TForm1.UpdatePixels();
@@ -179,7 +174,8 @@ begin
       newPos[0] := snake[0][0];
       newPos[1] := snake[0][1] + 1;
    end;
-   InsertX(snake, 0, newPos);
+   //InsertX(snake, 0, newPos);
+   PrependItem(snake, newPos);
    UpdatePixels();
    DebugSnake();
    WriteLn('End Timer');

@@ -17,10 +17,13 @@ type
     Button1: TButton;
     Image1: TImage;
     Label1: TLabel;
+    Timer1: TTimer;
     procedure Button1Click(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure spawnNewFood();
+    procedure Timer1Timer(Sender: TObject);
     procedure UpdatePixels();
+    procedure InsertX(var A: snakeArrayType; const Index: Cardinal; const Value: Variant);
   private
 
   public
@@ -32,6 +35,7 @@ var
   snake: snakeArrayType;
   snakePixels: array of TRect;
   food: array[0..1] of integer;
+  currentAction: string;  //'down', 'up', 'left', 'right'
 
 implementation
 {$R *.lfm}
@@ -57,12 +61,30 @@ begin
    snake[2][1] := 2;
 
    UpdatePixels();
+   Timer1.Enabled:=true;
 end;
 
+procedure TForm1.InsertX(var A: snakeArrayType; const Index: Cardinal; const Value: Variant);
+var
+  ALength: Cardinal;
+  TailElements: Cardinal;
+begin
+  ALength := Length(A);
+  Assert(Index <= ALength);
+  SetLength(A, ALength + 1);
+  Finalize(A[ALength]);
+  TailElements := ALength - Index;
+  if TailElements > 0 then
+  begin
+    Move(A[Index], A[Index + 1], SizeOf(Variant) * TailElements);
+  end;
+  Initialize(A[Index]);
+  A[Index] := Value;
+end;
 
 procedure TForm1.UpdatePixels();
 var
-  i,j : Integer;
+  i: Integer;
   MyRect: TShape;
 begin
   for i := 0 to Length(snake) - 1 do
@@ -71,7 +93,6 @@ begin
     with MyRect do
     begin
       Shape:=stRectangle;
-      Color:=clRed;
       Height := 30;
       Width := 30;
       Parent := Self;
@@ -82,25 +103,33 @@ begin
   end;
 end;
 
-function AppendToArray(const Item: Variant; var ArrayToModify: variantArrayType): variantArrayType;
-begin
-   SetLength(ArrayToModify, Length(ArrayToModify) + 1);
-   ArrayToModify[Length(ArrayToModify) - 1] := Item;
-   AppendToArray := ArrayToModify;
-end;
 
 procedure TForm1.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
   );
 begin
-  WriteLn(key);
+  if key = 40 then
+  begin
+    currentAction:='down';
+  end
+  else if key = 37 then
+  begin
+    currentAction:='left';
+  end
+  else if key = 39 then
+  begin
+    currentaction := 'right';
+  end
+  else if key = 38 then
+  begin
+    currentAction := 'up';
+  end
+  else
+  begin
+    currentAction := 'down';
+  end;
+
+  writeln(currentAction);
   key := 0;
-
-  //Move Snake
-
-
-
-
-
 end;
 
 procedure TForm1.spawnNewFood();
@@ -110,6 +139,57 @@ begin
   food[1] := random(10);
   Image1.Left:=food[0] * 30;
   Image1.Top:=food[1] * 30;
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+var newPos: array of integer;
+begin
+   SetLength(newPos, 2);
+   newPos[0] := 0;
+   newPos[1] := 0;
+   if currentAction = 'right' then
+   begin
+      newPos[0] := snake[0][0] + 1;
+      newPos[1] := snake[0][1];
+   end
+   else if currentAction = 'left' then
+   begin
+      newPos[0] := snake[0][0] - 1;
+      newPos[1] := snake[0][1];
+   end
+   else if currentAction = 'up' then
+   begin
+      newPos[0] := snake[0][0];
+      newPos[1] := snake[0][1] - 1;
+   end
+   else if currentAction = 'down' then
+   begin
+      newPos[0] := snake[0][0];
+      newPos[1] := snake[0][1] + 1;
+   end;
+   InsertX(snake, 0, newPos);
+   UpdatePixels();
+end;
+
+procedure TForm1.DebugSnake();
+var i,j: Integer;
+begin
+   for i := 0 to length(snake) do
+   begin
+     Write(i + ' ');
+   end;
+   for i := 0 to length(snake) do
+   begin
+     Write('--');
+   end;
+   for i := 0 to length(snake) do
+   begin
+     Write(snake[i][0] + ' ');
+   end;
+   for i := 0 to length(snake) do
+   begin
+     Write(snake[i][1] + ' ');
+   end;
 end;
 
 end.

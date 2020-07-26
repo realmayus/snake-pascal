@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = -673
+  Left = -332
   Height = 300
-  Top = 542
+  Top = 282
   Width = 300
   Caption = 'Form1'
   ClientHeight = 300
@@ -570,5 +570,11 @@ object Form1: TForm1
     }
     Stretch = True
     Transparent = True
+  end
+  object Timer1: TTimer
+    Enabled = False
+    OnTimer = Timer1Timer
+    left = 235
+    top = 42
   end
 end

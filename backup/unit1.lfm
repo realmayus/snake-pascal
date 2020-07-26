@@ -1,9 +1,9 @@
 object Form1: TForm1
-  Left = -678
+  Left = -519
   Height = 300
-  Top = 276
+  Top = 290
   Width = 300
-  Caption = 'Form1'
+  Caption = 'Snake'
   ClientHeight = 300
   ClientWidth = 300
   KeyPreview = True
@@ -570,6 +570,16 @@ object Form1: TForm1
     }
     Stretch = True
     Transparent = True
+    Visible = False
+  end
+  object ScoreLabel: TLabel
+    Left = 136
+    Height = 15
+    Top = 32
+    Width = 35
+    Caption = 'Score: '
+    ParentColor = False
+    Visible = False
   end
   object Timer1: TTimer
     Enabled = False

@@ -17,6 +17,7 @@ type
     Button1: TButton;
     Image1: TImage;
     Label1: TLabel;
+    ScoreLabel: TLabel;
     Timer1: TTimer;
     procedure Button1Click(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -27,6 +28,7 @@ type
     procedure DebugSnake();
     procedure DeleteX(var A: snakeArrayType; const Index: Cardinal);
     procedure ClearRectangles();
+    function IsHeadInTail(const Head: array of integer; const Tail: snakeArrayType): boolean;
   private
 
   public
@@ -38,6 +40,7 @@ var
   snake: snakeArrayType;
   snakePixels: array of TShape;
   food: array[0..1] of integer;
+  score: integer;
   currentAction: string;  //'down', 'up', 'left', 'right'
 implementation
 {$R *.lfm}
@@ -45,7 +48,6 @@ implementation
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-   writeln('game started');
    spawnNewFood();
    Image1.Visible:=true;
    Button1.Visible:=false;
@@ -59,11 +61,12 @@ begin
    snake[1][0] := 6;
    snake[1][1] := 2;
 
-   snake[2][0] := 7;
-   snake[2][1] := 2;
+
 
    UpdatePixels();
    Timer1.Enabled:=true;
+   ScoreLabel.Visible:=True;
+   ScoreLabel.Caption:='Score: 0';
 end;
 
 
@@ -74,7 +77,7 @@ begin
   SetLength(tempArray, Length(snakeArray) + 1);
   tempArray[0] := item;
   for i := Low(snakeArray) to High(snakeArray) do
-      tempArray[1+i] := snakeArray[i];
+      tempArray[i + 1] := snakeArray[i];
   SetLength(snakeArray, Length(snakeArray) + 1);
   snakeArray := tempArray;
 end;
@@ -145,6 +148,7 @@ begin
   key := 0;
 end;
 
+
 procedure TForm1.spawnNewFood();
 begin
   randomize();
@@ -165,38 +169,85 @@ begin
   SetLength(A, ALength - 1);
 end;
 
+function TForm1.IsHeadInTail(const Head: array of integer;
+  const Tail: snakeArrayType): boolean;
+var
+  i: integer;
+begin
+  for i := 1 to High(Tail) do
+    if (Head[0] = Tail[i][0]) and (Head[1] = Tail[i][1]) then
+      Exit(true);
+  Result := false;
+end;
+
 procedure TForm1.Timer1Timer(Sender: TObject);
 var newPos: array of integer;
+  reply: integer;
 begin
-   Writeln('Start Timer');
+   reply := -5;
    SetLength(newPos, 2);
    newPos[0] := 0;
    newPos[1] := 0;
    writeln(currentAction);
    if currentAction = 'right' then
    begin
-      newPos[0] := snake[0][0] + 1;
+      if snake[0][0] = 10 then
+      begin
+        newPos[0] := 0;
+      end
+      else
+      begin
+        newPos[0] := snake[0][0] + 1;
+      end;
       newPos[1] := snake[0][1];
    end
    else if currentAction = 'left' then
    begin
-      newPos[0] := snake[0][0] - 1;
+      if snake[0][0] = 0 then
+      begin
+        newPos[0] := 10;
+      end
+      else
+      begin
+        newPos[0] := snake[0][0] - 1;
+      end;
       newPos[1] := snake[0][1];
    end
    else if currentAction = 'up' then
    begin
       newPos[0] := snake[0][0];
-      newPos[1] := snake[0][1] - 1;
+      if snake[0][1] = 0 then
+      begin
+         newPos[1] := 10;
+      end
+      else
+      begin
+         newPos[1] := snake[0][1] - 1;
+      end;
    end
    else if currentAction = 'down' then
    begin
       newPos[0] := snake[0][0];
-      newPos[1] := snake[0][1] + 1;
+      if snake[0][1] = 10 then
+      begin
+         newPos[1] := 0;
+      end
+      else
+      begin
+         newPos[1] := snake[0][1] + 1;
+      end;
    end
    else
    begin
-      newPos[0] := snake[0][0];
-      newPos[1] := snake[0][1] + 1;
+     newPos[0] := snake[0][0];
+      if snake[0][1] = 10 then
+      begin
+         newPos[1] := 0;
+      end
+      else
+      begin
+         newPos[1] := snake[0][1] + 1;
+      end;
    end;
 
    PrependItem(snake, newPos);
@@ -204,15 +255,28 @@ begin
    if (newPos[0] = food[0]) and (newPos[1] = food[1]) then
    begin
       WriteLn('Ate food!');
+      score := score + 1;
+      scoreLabel.Caption := 'Score: ' + IntToStr(score);
+      spawnNewFood();
    end
    else
    begin
-      DeleteX(snake, length(snake) - 2);
+      DeleteX(snake, length(snake) - 1);
       ClearRectangles();
    end;
+
+   if IsHeadInTail(newPos, snake) and (length(snake) >= 5) then
+   begin
+      Form1.Visible:=false;
+      Timer1.Enabled:=false;
+      reply := Application.MessageBox(PChar('You lose. Score: ' + IntToStr(score)), PChar('Game over'),MB_ICONINFORMATION);
+      halt(0);
+   end;
+
    UpdatePixels();
-   DebugSnake();
-   WriteLn('End Timer');
+   //DebugSnake();
+
+   Timer1.Interval:= 150 - ((Round(length(snake)/5 + length(snake)/10)) mod 120);
 end;
 
 procedure TForm1.DebugSnake();

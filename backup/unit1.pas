@@ -24,6 +24,7 @@ type
     procedure Timer1Timer(Sender: TObject);
     procedure UpdatePixels();
     procedure InsertX(var A: snakeArrayType; const Index: Cardinal; const Value: Variant);
+    procedure DebugSnake();
   private
 
   public
@@ -87,6 +88,7 @@ var
   i: Integer;
   MyRect: TShape;
 begin
+  WriteLn('Start UpdatePixels');
   for i := 0 to Length(snake) - 1 do
   begin
     MyRect := TShape.Create(Self);
@@ -101,6 +103,9 @@ begin
     end;
 
   end;
+  SetLength(snakePixels, length(snakepixels) + 1);
+  snakepixels[length(snakePixels) - 1] := MyRect;
+  Writeln('End UpdatePixels');
 end;
 
 
@@ -144,9 +149,11 @@ end;
 procedure TForm1.Timer1Timer(Sender: TObject);
 var newPos: array of integer;
 begin
+   Writeln('Start Timer');
    SetLength(newPos, 2);
    newPos[0] := 0;
    newPos[1] := 0;
+   writeln(currentAction);
    if currentAction = 'right' then
    begin
       newPos[0] := snake[0][0] + 1;
@@ -166,30 +173,43 @@ begin
    begin
       newPos[0] := snake[0][0];
       newPos[1] := snake[0][1] + 1;
+   end
+   else
+   begin
+      newPos[0] := snake[0][0];
+      newPos[1] := snake[0][1] + 1;
    end;
    InsertX(snake, 0, newPos);
    UpdatePixels();
+   DebugSnake();
+   WriteLn('End Timer');
 end;
 
 procedure TForm1.DebugSnake();
 var i,j: Integer;
 begin
-   for i := 0 to length(snake) do
+   for i := 0 to length(snake) -1 do
    begin
-     Write(i + ' ');
+     Write(i, ' ');
    end;
-   for i := 0 to length(snake) do
+   WriteLn('.');
+   for i := 0 to length(snake) -1 do
    begin
      Write('--');
    end;
-   for i := 0 to length(snake) do
+   WriteLn('.');
+   for i := 0 to length(snake) -1 do
    begin
-     Write(snake[i][0] + ' ');
+     Write(snake[i][0], ' ');
    end;
-   for i := 0 to length(snake) do
+   WriteLn('.');
+   for i := 0 to length(snake) -1 do
    begin
-     Write(snake[i][1] + ' ');
+     Write(snake[i][1], ' ');
    end;
+   WriteLn('.');
+   WriteLn('.');
+   WriteLn('.');
 end;
 
 end.

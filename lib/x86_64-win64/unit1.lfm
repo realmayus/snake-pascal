@@ -4,8 +4,8 @@ object Form1: TForm1
   Top = 290
   Width = 300
   Caption = 'Snake'
-  ClientHeight = 300
-  ClientWidth = 300
+  ClientHeight = 0
+  ClientWidth = 0
   KeyPreview = True
   OnKeyDown = FormKeyDown
   LCLVersion = '2.0.10.0'

@@ -25,6 +25,8 @@ type
     procedure UpdatePixels();
     procedure PrependItem(var snakeArray: snakeArrayType; const item: Variant);
     procedure DebugSnake();
+    procedure DeleteX(var A: snakeArrayType; const Index: Cardinal);
+    procedure ClearRectangles();
   private
 
   public
@@ -37,7 +39,6 @@ var
   snakePixels: array of TShape;
   food: array[0..1] of integer;
   currentAction: string;  //'down', 'up', 'left', 'right'
-
 implementation
 {$R *.lfm}
 { TForm1 }
@@ -78,12 +79,22 @@ begin
   snakeArray := tempArray;
 end;
 
+procedure TForm1.ClearRectangles();
+var
+  i: integer;
+begin
+  for i := self.ComponentCount - 1 downto 0 do
+  begin
+   if self.Components[i] is TShape then
+      self.Components[i].Free;
+  end;
+end;
+
 procedure TForm1.UpdatePixels();
 var
   i: Integer;
   MyRect: TShape;
 begin
-  WriteLn('Start UpdatePixels');
   for i := 0 to Length(snake) - 1 do
   begin
     MyRect := TShape.Create(Self);
@@ -100,7 +111,9 @@ begin
   end;
   SetLength(snakePixels, length(snakepixels) + 1);
   snakepixels[length(snakePixels) - 1] := MyRect;
-  Writeln('End UpdatePixels');
+
+  Image1.Left:=food[0] * 30;
+  Image1.Top:=food[1] * 30;
 end;
 
 
@@ -137,8 +150,19 @@ begin
   randomize();
   food[0] := random(10);
   food[1] := random(10);
-  Image1.Left:=food[0] * 30;
-  Image1.Top:=food[1] * 30;
+end;
+
+procedure TForm1.DeleteX(var A: snakeArrayType; const Index: Cardinal);
+var
+  ALength: Cardinal;
+  i: Cardinal;
+begin
+  ALength := Length(A);
+  Assert(ALength > 0);
+  Assert(Index < ALength);
+  for i := Index + 1 to ALength - 1 do
+    A[i - 1] := A[i];
+  SetLength(A, ALength - 1);
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);
@@ -174,15 +198,25 @@ begin
       newPos[0] := snake[0][0];
       newPos[1] := snake[0][1] + 1;
    end;
-   //InsertX(snake, 0, newPos);
+
    PrependItem(snake, newPos);
+
+   if (newPos[0] = food[0]) and (newPos[1] = food[1]) then
+   begin
+      WriteLn('Ate food!');
+   end
+   else
+   begin
+      DeleteX(snake, length(snake) - 2);
+      ClearRectangles();
+   end;
    UpdatePixels();
    DebugSnake();
    WriteLn('End Timer');
 end;
 
 procedure TForm1.DebugSnake();
-var i,j: Integer;
+var i: Integer;
 begin
    for i := 0 to length(snake) -1 do
    begin

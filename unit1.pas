@@ -56,7 +56,7 @@ begin
 
    //Es gibt zwei Arrays, 'snakePixels' und 'snake'
 
-   //snakePixels beeinhaltet die tatsächlichen Rechtecke, aus denen die Snake visuell aufgebaut ist.
+   //snakePixels beinhaltet die tatsächlichen Rechtecke, aus denen die Snake visuell aufgebaut ist.
    //Dies wird gemacht, damit diese nicht durch Garbage Collection verloren gehen
    //(d.h. damit Pascal nicht denkt, die Rechtecksobjekte werden nicht mehr
    //gebraucht und "entsorgt" sie, um Arbeitsspeicher zu sparen.
